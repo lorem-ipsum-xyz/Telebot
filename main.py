@@ -1,15 +1,3 @@
-'''
-================[ Telegram BOT ]==================
-DEV: Christopher
-Github: https://github.com/lorem-ipsum-xyz
-Facebook: httpa://facebook.com/greegmon.1
-
-- this code is open source, feel free to modify
-  this, and if you have a question to developer you
-  can dm me on messenger
-- Sorry if you can't understand my code :(
-==================================================
-'''
 import os
 import importlib
 import threading
