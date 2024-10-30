@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block jss %}{% endblock %}
+
+{% block content %}
+  {% if title == 'get_bot_token' %}
+    {% include 'get_bot_token.html' %}
+  {% endif %}
+{% endblock %}

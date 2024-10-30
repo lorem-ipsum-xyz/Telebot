@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Autobot (telegram){% endblock %}
+{% block content %}
+
+<div id="root">
+  <header>
+    <h1>TELEBOT</h1>
+  </header>
+  <div id="container">
+    <div class="form">
+      
+      <div class="TOKEN box">
+        <p class="label">TOKEN</p>
+        <input type="text" id="token" placeholder="Bot token....">
+        <small><a href='http://localhost:5000'>how to get bot token?</a></small>
+      </div>
+      
+      <div class="COMMANDS box">
+        <p class="label">COMMANDS</p>
+        <br>
+        <button class="sa" onclick="selectAll()">Select All</button>
+        
+        <div class="items">
+          <div class="even ret">
+          </div>
+          <div class="odd ret">
+          </div>
+        </div>
+      </div>
+      
+      <div class="OWNER-INFO box">
+        <p class="label">OWNER INFO (optional)</p>
+        <br>
+        
+        <div class="control">
+          <p class="label pl-1">Name:</p>
+          <input type="text" placeholder="Enter your name..." id="name">
+        </div>
+        <br>
+        <div class="control">
+          <p class="label pl-1">ID:</p>
+          <input type="number" placeholder="Your telegram ID" id="id">
+          <small><a href="https://google.com">How to get my ID?</a></small>
+        </div>
+        <br>
+        <div class="control">
+          <p class="label pl-1">Links:</p>
+          
+          <div class="links">
+            
+            <div class="item">
+              <input type="text" placeholder="label" oninput="fuck(this)">
+              <input type="text" placeholder="https://example.com/test" oninput="fuck(this)">
+            </div>
+            
+          </div>
+          <br>
+          <button class="addLink" onclick="addLink()" disabled=""><i class="fa-solid fa-add"></i> Add more link</button>
+          
+        </div>
+        
+      </div>
+      
+      <div class="main box">
+        <button class="submit" onclick="submit()">Submit</button>
+        <br><br>
+        
+        <div class="label pl-1">ONLINE:</div>
+        <div class="active">
+          <!-- Bot list here... -->
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block jss %}
+<script src="{{ url_for('static',filename='home.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+{% endblock %}
