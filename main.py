@@ -178,7 +178,7 @@ def logout():
   return jsonify({"status": 'error', "message": 'bot token not found in the list, double check if the provided token is valid'}),1002
 
 def start_flask():
-  app.run()
+  app.run(port=80)
 # =========================================
 
 def register_command(bot, name, func, info):
