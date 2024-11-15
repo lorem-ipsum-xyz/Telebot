@@ -227,7 +227,7 @@ def reg_cmd(bot,_):
               config['filename'] = file
               cmd.add(config)
             else:
-              print(f"\033[0;91m[ WARNING ] \033[97m([\033[33m{cName}]\033[97m]|\033[36m{o[1]["filename"]}\033[97m) - Duplication command name")
+              print(f"\033[0;91m[ WARNING ] \033[97m([\033[33m{cName}]\033[97m]|\033[36m{o[1]['filename']}\033[97m) - Duplication command name")
           else:
             register_command(bot, cName, func, _)
       else:
