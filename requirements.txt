@@ -1,6 +1,6 @@
 python-dotenv
 pyTelegramBotAPI
 gunicorn
-box
+python-box
 Flask
 bs4
