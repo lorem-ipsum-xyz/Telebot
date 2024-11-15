@@ -33,6 +33,7 @@ cmd = Commands()
 online = Online
 load_dotenv()
 start = time.time()
+port = int(os.environ.get('PORT', 5000))
 
 botDaddy = [7207775263]
 god = [7075537944]
@@ -178,7 +179,7 @@ def logout():
   return jsonify({"status": 'error', "message": 'bot token not found in the list, double check if the provided token is valid'}),1002
 
 def start_flask():
-  app.run(port=80)
+  app.run(host='0.0.0.0',port=port)
 # =========================================
 
 def register_command(bot, name, func, info):
