@@ -91,7 +91,7 @@ class CreateBot:
       return True
     return False
   def getProfile(self,token,id):
-    pfp = f"{self.baseUrl}/file/bot{token}/photos/file_0.jpg"
+    pfp = f"{self.baseUrl}/file/bot{self.token}/photos/file_0.jpg"
     response = requests.get(pfp)
     if response.status_code == 200:
       imgbbKey = os.getenv("IMGBB_KEY")
