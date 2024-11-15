@@ -4,6 +4,9 @@
   Github: https://github.com/Greemon
   Facebook: https://facebook.com/greegmon.1
 
+pyTelegramBotAPI (telebot) documentation:
+  -> https://pytba.readthedocs.io
+
 mga kupal sa Chatbot Community: 
   • BOGART (https://www.facebook.com/bogart.magalpok.2024)
   • JUNMAR (https://www.facebook.com/profile.php?id=100081852204977)
