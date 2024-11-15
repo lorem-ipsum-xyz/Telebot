@@ -5,5 +5,9 @@
 {% block content %}
   {% if title == 'get_bot_token' %}
     {% include 'get_bot_token.html' %}
+  {% elif title == 'get_my_id' %}
+    {% include 'get_user_ie.html' %}
+  {% else %}
+    {% include 'notFound.html' %}
   {% endif %}
 {% endblock %}

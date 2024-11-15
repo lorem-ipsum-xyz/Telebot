@@ -1,0 +1,5 @@
+python-dotenv
+pyTelegramBotAPI
+box
+Flask
+bs4

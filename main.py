@@ -1,40 +1,38 @@
+'''
+---------> [ Telebot (not done yet) ] <----------
+  Developer: Greegmon
+  Github: https://github.com/Greemon
+  Facebook: https://facebook.com/greegmon.1
+
+mga kupal sa Chatbot Community: 
+  • BOGART (https://www.facebook.com/bogart.magalpok.2024)
+  • JUNMAR (https://www.facebook.com/profile.php?id=100081852204977)
+  • ASHLEY (https://www.facebook.com/ystellafavoredieu)
+  • KENT NATHAN (https://www.facebook.com/profile.php?id=61550088000548)
+'''
 import os
 import importlib
 import threading
-import telebot
 import time
 import requests
+import telebot
+import telebot.util as Util
 from box import Box
-from tb import Commands, font, Events
+from tb import Commands, Online
 from flask import Flask, request, render_template, jsonify
 from dotenv import load_dotenv
+from utils import (
+  log
+)
 
-event = Events()
-cmd = Commands()
-start = time.time()
-load_dotenv()
 app = Flask(__name__)
+cmd = Commands()
+online = Online
+load_dotenv()
+start = time.time()
 
 botDaddy = [7207775263]
-ACTIVE_BOTS = {
-  "GeegaBOT": {
-    "name": 'GeegaBOT',
-    "id": 7207775263,
-    "start_time": start,
-    "profile": 'https://api.telegram.org/file/bot7207775263:AAFXZg9q_seXBAr5OHo3v0H2Y4dSwAMUSZM/photos/file_0.jpg',
-    "token": '7207775263:AAFXZg9q_seXBAr5OHo3v0H2Y4dSwAMUSZM',
-    "commands": ['help','start','uptime'],
-    "api": telebot.TeleBot('7207775263:AAFXZg9q_seXBAr5OHo3v0H2Y4dSwAMUSZM',parse_mode=None),
-    "owner": {
-      "name": 'Greegmon',
-      "id": 7075537944,
-      "links": [
-        ('facebook', 'https://facebook.com/greegmon.1'),
-        ('github', 'https://github.com/Greegmon')
-      ]
-    }
-  }
-}
+god = [7075537944]
 
 class CreateBot:
   def __init__(self, token, commands, owner_name='Anonymous', owner_id=1234567890, owner_links=[]):
@@ -44,7 +42,7 @@ class CreateBot:
     self.token = token
     self.start_time = time.time()
     self.commands = commands
-    self.api = telebot.TeleBot(token, parse_mode=None)
+    self.api = telebot.TeleBot(token, parse_mode='HTML')
     self.owner_name = owner_name
     self.owner_id = owner_id
     self.owner_links = owner_links
@@ -52,8 +50,8 @@ class CreateBot:
     self.baseUrl = 'https://api.telegram.org'
     if not self.isValidToken():
       raise ValueError('Invalid bot token')
-  def create(self):
-    ACTIVE_BOTS[self.name] = {
+  def create(self) -> tuple:
+    online.new({
       "name": self.name,
       "id": self.id,
       "token": self.token,
@@ -66,9 +64,9 @@ class CreateBot:
         "id": self.owner_id,
         "links": self.owner_links
       }
-    }
+    })
     self.registerCommand(self.commands)
-    return {
+    return ({
       "name":self.name,
       "id":self.id,
       "profile": self.profile,
@@ -78,13 +76,13 @@ class CreateBot:
         "id": self.owner_id,
         "links": self.owner_links
       }
-    }
-  def isValidToken(self):
+    }, self.api)
+  def isValidToken(self) -> bool:
     res = requests.get(f"{self.baseUrl}/bot{self.token}/getMe")
     if res.status_code == 200:
       data = res.json()['result']
       self.name = data['username']
-      self.id = data['id']
+      self.id = int(data['id'])
       self.profile = self.getProfile(self.token, data['id']) or self.profile
       return True
     return False
@@ -105,32 +103,34 @@ class CreateBot:
         CMDS.append(telebot.types.BotCommand(val['name'], val['description']))
     self.api.set_my_commands(CMDS)
 
+def isBotAlreadyCreated(token):
+  for _,value in online.getAll().items():
+    if value['token'] == token:
+      return True
+  return False
+
 # =========================================
 @app.route('/home')
 @app.route('/')
 def root():
-  return render_template('home.html'), 200
+  return render_template('home.html'),200
 
 @app.route('/tuts/<page>')
 def tutorial(page):
-  if page in ['get_bot_token','get_my_id','create_bot']:
-    return render_template('tutorial.html', title=page),200
-  return render_template('404.html')
+  return render_template('tutorial.html', title=page)
 
 @app.route('/getCommands', methods=['GET'])
 def get_commands():
   kupal = list()
   for key, value in cmd.get_all().items():
-    if value.get('forDaddy'):
-      pass
-    else:
+    if not value.get('forDaddy'):
       kupal.append(key)
   return jsonify(kupal),200
 
 @app.route('/actives',methods=['GET'])
 def active_bot():
   active = []
-  for name, val in ACTIVE_BOTS.items():
+  for name, val in online.getAll().items():
     active.append({
       "name": name,
       "id": val['id'],
@@ -148,18 +148,31 @@ def login():
     OWNER_ID = data.get('owner_id')
     OWNER_LINKS = data.get('owner_links')
     
+    if isBotAlreadyCreated(TOKEN):
+      return ({"status": 'error', "message": 'The bot token has already been added to the list.'}),1002
+    
     # Create the bot
     BOT = CreateBot(TOKEN, COMMANDS, owner_name=OWNER_NAME, owner_id=OWNER_ID, owner_links=OWNER_LINKS)
     tae = BOT.create()
     data = {
-      "name": tae['name'],
-      "commands": tae['commands'],
-      "id": tae['id'],
-      "owner": tae['owner']
+      "name": tae[0]['name'],
+      "commands": tae[0]['commands'],
+      "id": tae[0]['id'],
+      "owner": tae[0]['owner']
     }
-    return jsonify(tae),200
+    
+    return data
   except ValueError as e:
-    return jsonify({"status": 'error', "message": str(e)}),403
+    return jsonify({"status": 'error', "message": str(e)}),1001
+
+@app.route('/logout', methods=['GET'])
+def logout():
+  token = request.args.get('token')
+  for _,val in online.getAll().items():
+    if val['token'] == token.strip():
+      online.delete(token=token.strip())
+      return jsonify({"status": 'success'}),200
+  return jsonify({"status": 'error', "message": 'bot token not found in the list, double check if the provided token is valid'}),1002
 
 def start_flask():
   app.run()
@@ -170,14 +183,15 @@ def register_command(bot, name, func, info):
   if name.lower() in f:
     @bot.message_handler(commands=[name.lower(), name.upper(), name.title()])
     def handle_command(msg):
-      text = msg.text.split(' ', 1)
+      command,arguments = Util.extract_command(msg.text),Util.extract_arguments(msg.text)
       obj = Box({
-        'font': font,
-        'cmd': text[0],
-        'text': text[1] if len(text) > 1 else None,
+        'line': '━━━━━━━━━━━━━━━━━━━', # Wala lang to :)
+        'cmd': command,
+        'text': arguments,
+        'log': log,
         'bot': {
           "name": info["name"],
-          "id": info["id"],
+          "id": int(info["id"]),
           "start_time": info['start_time'],
           "token": info["token"],
           "profile": info["profile"],
@@ -186,12 +200,11 @@ def register_command(bot, name, func, info):
         }
       })
       func(msg, bot, obj)
+
 alreadyLoad = False
 def reg_cmd(bot,_):
   global alreadyLoad
   xil=list(filter(lambda file: file.endswith('.py') and file!='__init__.py',os.listdir('./modules/commands')))
-  zil=list(filter(lambda file: file.endswith('.py') and file!='__init__.py',os.listdir('./modules/events')))
-  
   for file in xil:
     filepath = f'modules.commands.{os.path.splitext(file)[0]}'
     module = importlib.import_module(filepath)
@@ -217,36 +230,25 @@ def reg_cmd(bot,_):
       else:
         if not alreadyLoad:
           print(f"\033[0;91m[ ERROR ] \033[36m({file}) \033[0mMissing 'def' or 'name' key in config.")
-  for file in zil:
-    fullpath = f"modules.events.{os.path.splitext(file)[0]}"
-    module = importlib.import_module(fullpath)
-    config = getattr(module,'config',None)
-    if config:
-      name, event_type, func = (
-        config.get('name'),
-        config.get('event_type'),
-        config.get('def')
-      )
-      #print(config.get('name'))
   if not alreadyLoad:
     print(f"\033[0;92m[ PING ] \033[0m{(time.time() - start)*1000:.2f}ms")
     alreadyLoad = True
 
 def start_bot(bot,_):
   reg_cmd(bot,_)
-  bot.infinity_polling()
+  bot.polling()
 #--------------
 
 def monitor():
   processed_bots = set()
   while True:
-    for jkl in ACTIVE_BOTS.items():
+    for jkl in online.getAll().items():
       cmdName, val = jkl
       if cmdName not in processed_bots:
         h = threading.Thread(target=start_bot, args=(val['api'],val))
         h.start()
         processed_bots.add(cmdName)
-    time.sleep(1)
+    time.sleep(0.5)
 
 if __name__ == '__main__':
   #app.run(debug=True)

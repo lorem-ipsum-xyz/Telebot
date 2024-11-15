@@ -122,30 +122,42 @@ function active_bots(){
   }).catch(err=>console.error(err))
 }
 
-function login(obj){
+async function login(obj){
   const Toast = Swal.mixin({toast: true,position: "top",showConfirmButton: false,timer: 2300,timerProgressBar: true});
   Toast.fire({
     icon: "info",
     title: "Processing you request."
   });
-  fetch('/login', {method: 'POST',headers: {"Content-Type":'application/json'},body: JSON.stringify(obj)})
-    .then(response => {
-      if (response.ok) return response.json()
+  try{
+    const response = await fetch('/login',{
+      method: 'POST',
+      headers: {"Content-Type": 'application/json'},
+      body: JSON.stringify(obj)
+    });
+    if (!response.ok){
+      const errorData = await response.json();
       Toast.fire({
         icon: 'error',
-        title: "Request failed"
+        title: errorData.message
       })
-      throw new Error(`Request failed with status: ${response.status}`)
-    }).then(data => {
-      Toast.fire({icon:'success',title:'Successfully logged in'})
-      document.getElementById('token').value = '';
-      document.getElementById('name').value = '';
-      document.getElementById('id').value = '';
-      loadCommands()
-      if(document.querySelector('.sa').classList.contains('selectAll')) document.querySelector('.sa').classList.remove('selectAll')
-      document.querySelector('.links').innerHTML = `<div class="item"><input type="text" placeholder="label" oninput="fuck(this)"><input type="text" placeholder="https://example.com/test" oninput="fuck(this)"></div>`;
-      active_bots()
-    }).catch(error => {pak=false;console.error('Error:', error)})
+      throw new Error(errorData.message)
+    }
+    const data = await response.json();
+    Toast.fire({icon:'success',title:'Successfully logged in'})
+    document.getElementById('token').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('id').value = '';
+    loadCommands()
+    if(document.querySelector('.sa').classList.contains('selectAll')) document.querySelector('.sa').classList.remove('selectAll')
+    document.querySelector('.links').innerHTML = `<div class="item"><input type="text" placeholder="label" oninput="fuck(this)"><input type="text" placeholder="https://example.com/test" oninput="fuck(this)"></div>`;
+    active_bots()
+  }catch(e){
+    Toast.fire({
+      icon: 'error',
+      title: e.message
+    })
+    console.error("Error: ",e)
+  }
 }
 
 function submit(){
