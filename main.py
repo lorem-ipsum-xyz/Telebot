@@ -127,7 +127,7 @@ def tutorial(page):
 def get_commands():
   kupal = list()
   for key, value in cmd.get_all().items():
-    if not value.get('forDaddy'):
+    if not value.get('botDaddy'):
       kupal.append(key)
   return jsonify(kupal),200
 
